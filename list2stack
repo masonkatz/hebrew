@@ -1,0 +1,36 @@
+#! /usr/bin/env python
+
+import sys
+import types
+import codecs
+import unicodedata
+
+assert len(sys.argv) == 2
+
+filename = sys.argv[1]
+
+fin   = codecs.open(filename, encoding='utf-8')
+fout1 = codecs.open('%s.niqud.stack' % filename, 'w', encoding='utf-8') 
+fout2 = codecs.open('%s.stack' % filename, 'w', encoding='utf-8')
+
+term  = None
+defn  = None
+for line in fin.readlines():
+	line = line.strip()
+
+	if not term:
+		if len(line) > 0:
+			term = line
+	else:
+		if len(line) > 0:
+			defn = line
+
+	if term and defn:
+		for c in '%s\t%s\n' % (term, defn):
+			fout1.write(c)
+			if not unicodedata.category(c) == 'Mn':
+				fout2.write(c)
+		term = None
+		defn = None
+fout1.close()
+fout2.close()
